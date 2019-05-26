@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -26,15 +28,10 @@ Tidy, analyze, and plot causal directed acyclic graphs (DAGs). `ggdag` uses the 
 
 You can install `ggdag` with:
 
-```{r cran-installation, eval = FALSE}
-install.packages("ggdag")
-```
-
-Or you can install the development version from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("malcolmbarrett/ggdag")
+devtools::install()
 ```
 
 ## Example
@@ -75,6 +72,7 @@ tidy_ggdag
 ```{r ggdag, dpi=300}
 ggdag(tidy_ggdag) +
   theme_dag()
+
 ggdag_adjustment_set(tidy_ggdag, node_size = 14) + 
   theme(legend.position = "bottom")
 

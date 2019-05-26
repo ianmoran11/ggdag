@@ -92,9 +92,26 @@ ggdag_adjustment_set <- function(.tdy_dag, exposure = NULL, outcome = NULL, ...,
                                  expand_x = expand_scale(c(0.25, 0.25)),
                                  expand_y = expand_scale(c(0.2, 0.2))) {
 
-
   .tdy_dag <- if_not_tidy_daggity(.tdy_dag) %>%
     dag_adjustment_sets(exposure = exposure, outcome = outcome, ...)
+
+dag_vec <- strsplit(.tdy_dag$dag,split = "\n")
+
+exposure_var <-
+  dag_vec[[1]][which(sapply(dag_vec,FUN = function(input){grepl("\\[exposure\\]",x = input)}))] %>%
+  gsub(pattern = " \\[exposure\\]",replacement = "",x = .)
+
+
+outcome_var <-
+  dag_vec[[1]][which(sapply(dag_vec,FUN = function(input){grepl("\\[outcome\\]",x = input)}))] %>%
+  gsub(pattern = " \\[outcome\\]",replacement = "",x = .)
+
+.tdy_dag <-
+.tdy_dag %>%
+  mutate(adjusted  = ifelse(name == exposure_var, "exposure",ifelse(name == outcome_var,"outcome",adjusted)))
+
+
+
 
    p <- ggplot2::ggplot(.tdy_dag, ggplot2::aes(x = x, y = y, xend = xend,
                                          yend = yend, shape = adjusted,
@@ -113,7 +130,9 @@ ggdag_adjustment_set <- function(.tdy_dag, exposure = NULL, outcome = NULL, ...,
                    show.legend = FALSE) +
              ggraph::scale_edge_colour_manual(drop = FALSE,
                      values = c("unadjusted" = "black",
-                                "adjusted" = "#FFFFFF00"))
+                                "adjusted" = "#FFFFFF00",
+                                 "outcome" = "#0080ff",
+                                 "exposure" = "#0080ff"))
 
   }
 
@@ -128,8 +147,7 @@ ggdag_adjustment_set <- function(.tdy_dag, exposure = NULL, outcome = NULL, ...,
   if (text) p <- p + geom_dag_text(col = text_col, size = text_size)
 
   if (!is.null(use_labels)) p <- p +
-      geom_dag_label_repel(ggplot2::aes_string(label = use_labels,
-                                               fill = "adjusted"), size = text_size,
+      geom_dag_label_repel(ggplot2::aes_string(label = use_labels), size = text_size,
                            col = label_col, show.legend = FALSE)
   p
 }
